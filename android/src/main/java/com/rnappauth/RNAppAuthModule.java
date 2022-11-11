@@ -16,7 +16,6 @@ import androidx.browser.customtabs.CustomTabsClient;
 import androidx.browser.customtabs.CustomTabsServiceConnection;
 import androidx.browser.customtabs.CustomTabsSession;
 import androidx.browser.customtabs.CustomTabsIntent;
-import androidx.browser.customtabs.TrustedWebUtils;
 
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -723,10 +722,9 @@ public class RNAppAuthModule extends ReactContextBaseJavaModule implements Activ
                     .setToolbarColor(colorInt)
                     .build();
             intentBuilder.setDefaultColorSchemeParams(defaultColors);
-
+            intentBuilder.setShareState(CustomTabsIntent.SHARE_STATE_OFF);
 
             CustomTabsIntent customTabsIntent = intentBuilder.build();
-            customTabsIntent.intent.putExtra(TrustedWebUtils.EXTRA_LAUNCH_AS_TRUSTED_WEB_ACTIVITY, true);
 
             Intent authIntent = authService.getAuthorizationRequestIntent(authRequest, customTabsIntent);
 
