@@ -5,14 +5,18 @@ import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.content.ActivityNotFoundException;
 import androidx.annotation.Nullable;
+import androidx.browser.customtabs.CustomTabColorSchemeParams;
 import androidx.browser.customtabs.CustomTabsCallback;
 import androidx.browser.customtabs.CustomTabsClient;
 import androidx.browser.customtabs.CustomTabsServiceConnection;
 import androidx.browser.customtabs.CustomTabsSession;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.browser.customtabs.TrustedWebUtils;
 
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -712,7 +716,19 @@ public class RNAppAuthModule extends ReactContextBaseJavaModule implements Activ
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             AuthorizationService authService = new AuthorizationService(context, appAuthConfiguration);
-            Intent authIntent = authService.getAuthorizationRequestIntent(authRequest);
+
+            CustomTabsIntent.Builder intentBuilder = authService.createCustomTabsIntentBuilder();
+            int colorInt = Color.parseColor("#FF0000"); //red
+            CustomTabColorSchemeParams defaultColors = new CustomTabColorSchemeParams.Builder()
+                    .setToolbarColor(colorInt)
+                    .build();
+            intentBuilder.setDefaultColorSchemeParams(defaultColors);
+
+
+            CustomTabsIntent customTabsIntent = intentBuilder.build();
+            customTabsIntent.intent.putExtra(TrustedWebUtils.EXTRA_LAUNCH_AS_TRUSTED_WEB_ACTIVITY, true);
+
+            Intent authIntent = authService.getAuthorizationRequestIntent(authRequest, customTabsIntent);
 
             currentActivity.startActivityForResult(authIntent, 52);
         } else {
